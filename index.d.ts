@@ -1,3 +1,5 @@
+// ---------- This package is for using ts components in Arfa JS framework ----------
+// ---------- https://www.npmjs.com/package/create-arfa ----------
 // ---------- Core node types ----------
 export type PrimitiveChild = string | number | boolean | null | undefined;
 export type ArfaNode = PrimitiveChild | VNode | ArfaNode[];
@@ -77,23 +79,17 @@ type IntrinsicElementProps<TagName extends keyof HTMLElementTagNameMap> =
 // ---------- Global JSX namespace ----------
 declare global {
   namespace JSX {
-    // What a JSX expression returns
     type Element = ArfaNode;
 
-    // Props for intrinsic HTML elements
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: IntrinsicElementProps<K>;
     } & {
-      // Fallback for custom elements/tags
       [elemName: string]: DOMAttributes & { children?: ArfaNode };
     };
   }
 
-  // Optional runtime globals (you set these in your app bootstrap)
-  // Values come from arfa-runtime; types come from here.
   var h: JSXFactory | undefined;
   var Fragment: FragmentComponent | undefined;
 }
 
-// Ensure this file is treated as a module by TS
 export {};
