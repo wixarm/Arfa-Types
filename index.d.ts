@@ -1,53 +1,96 @@
-// index.d.ts
-export type Primitive = string | number | boolean | null | undefined;
+// arfa-types/src/index.d.ts
 
-export type VNode = any;
-export type ReactishNode = VNode | Primitive | Array<ReactishNode>;
+// ---------- Core node types ----------
+export type PrimitiveChild = string | number | boolean | null | undefined;
+export type ArfaNode = PrimitiveChild | VNode | ArfaNode[];
 
-export type Component<P = {}> = (props: P) => ReactishNode | null;
+export interface VNode {
+  type: string | Component<any>;
+  props: Record<string, any> & { children?: ArfaNode };
+}
+
+// ---------- Component utility types ----------
+export type PropsWithChildren<P = {}> = P & { children?: ArfaNode };
+
+export type Component<P = {}> = (props: PropsWithChildren<P>) => ArfaNode;
 export type FC<P = {}> = Component<P>;
-export type PropsWithChildren<P> = P & { children?: ReactishNode };
-export type ComponentProps<T> = T extends Component<infer P> ? P : never;
 
-/**
- * Simple HTML attribute map — permissive to avoid coupling to DOM typings.
- * If you want stricter attribute types later we can extend this.
- */
-export interface IntrinsicAttributes {
-  key?: string | number;
+// Helpful aliases
+export type PageComponent<P = {}> = Component<P>;
+
+// ---------- Runtime function types (types only; values live in arfa-runtime) ----------
+export type JSXFactory = (
+  type: string | Component<any>,
+  props: Record<string, any> | null,
+  ...children: any[]
+) => VNode;
+
+export type FragmentComponent = (props: PropsWithChildren) => ArfaNode;
+
+// ---------- Router helpers ----------
+export type GuardFn = (
+  params?: any,
+  pathname?: string
+) => boolean | Promise<boolean>;
+
+export type PageModule = {
+  default: PageComponent<any>;
+  protect?: GuardFn;
+  protectRedirect?: string;
+} & Record<string, any>;
+
+export type RouteModules = Record<string, PageModule>;
+
+// ---------- Minimal DOM/JSX typings ----------
+type EventHandler<E extends Event = Event> = (event: E) => void;
+
+interface DOMAttributes {
+  // Common attributes
+  id?: string;
+  class?: string;
+  className?: string;
+  title?: string;
+  role?: string;
+  style?: string | Partial<CSSStyleDeclaration>;
+
+  // Allow any attribute (incl. any "on*" handler) for broad compatibility
+  [key: string]: any;
+
+  // Commonly used event handlers with better typing
+  onClick?: EventHandler<MouseEvent>;
+  onDblClick?: EventHandler<MouseEvent>;
+  onMouseDown?: EventHandler<MouseEvent>;
+  onMouseUp?: EventHandler<MouseEvent>;
+  onMouseEnter?: EventHandler<MouseEvent>;
+  onMouseLeave?: EventHandler<MouseEvent>;
+  onInput?: EventHandler<InputEvent>;
+  onChange?: EventHandler<Event>;
+  onSubmit?: EventHandler<SubmitEvent>;
+  onKeyDown?: EventHandler<KeyboardEvent>;
+  onKeyUp?: EventHandler<KeyboardEvent>;
 }
 
-/**
- * By default allow any intrinsic element / attributes.
- * You can replace `any` with stricter attribute maps if you want HTML autocomplete.
- */
-export interface IntrinsicElements {
-  [elemName: string]: any;
-}
+type IntrinsicElementProps<TagName extends keyof HTMLElementTagNameMap> =
+  DOMAttributes & {
+    children?: ArfaNode;
+  };
 
+// ---------- Global JSX namespace ----------
 declare global {
-  function h(
-    type: string | Function,
-    props: Record<string, any> | null,
-    ...children: any[]
-  ): VNode;
-  function Fragment(props: { children?: any }): any;
-
   namespace JSX {
-    type Element = VNode;
-    type ElementClass = any;
-    interface ElementAttributesProperty {
-      props: any;
-    }
-    interface ElementChildrenAttribute {
-      children: any;
-    }
+    type Element = ArfaNode;
 
-    interface IntrinsicAttributes
-      extends import("arfa-types").IntrinsicAttributes {}
-    interface IntrinsicElements
-      extends import("arfa-types").IntrinsicElements {}
+    type IntrinsicElements = {
+      [K in keyof HTMLElementTagNameMap]: IntrinsicElementProps<K>;
+    } & {
+      [elemName: string]: DOMAttributes & { children?: ArfaNode };
+    };
   }
+
+  // optional runtime globals (set in app bootstrap)
+  // These are typed here so TS won't complain when you write (globalThis as any).h
+  var h: JSXFactory | undefined;
+  var Fragment: FragmentComponent | undefined;
 }
 
 export {};
