@@ -1,18 +1,21 @@
 {
   "name": "arfa-types",
-  "version": "0.1.1",
-  "description": "TypeScript types and JSX declarations for Arfa",
+  "version": "0.1.0",
+  "description": "TypeScript types and JSX declarations for the Arfa framework",
   "types": "index.d.ts",
   "files": [
     "index.d.ts"
   ],
   "keywords": [
     "arfa",
-    "arfa js",
-    "arman tarhani",
     "typescript",
     "jsx",
     "types"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
 }
