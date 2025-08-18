@@ -1,5 +1,3 @@
-// arfa-types/src/index.d.ts
-
 // ---------- Core node types ----------
 export type PrimitiveChild = string | number | boolean | null | undefined;
 export type ArfaNode = PrimitiveChild | VNode | ArfaNode[];
@@ -15,10 +13,10 @@ export type PropsWithChildren<P = {}> = P & { children?: ArfaNode };
 export type Component<P = {}> = (props: PropsWithChildren<P>) => ArfaNode;
 export type FC<P = {}> = Component<P>;
 
-// Helpful aliases
+// Helpful alias for pages
 export type PageComponent<P = {}> = Component<P>;
 
-// ---------- Runtime function types (types only; values live in arfa-runtime) ----------
+// ---------- Runtime function types (values live in arfa-runtime) ----------
 export type JSXFactory = (
   type: string | Component<any>,
   props: Record<string, any> | null,
@@ -35,6 +33,7 @@ export type GuardFn = (
 
 export type PageModule = {
   default: PageComponent<any>;
+  // Optional guard metadata supported by your router’s _layout
   protect?: GuardFn;
   protectRedirect?: string;
 } & Record<string, any>;
@@ -53,10 +52,10 @@ interface DOMAttributes {
   role?: string;
   style?: string | Partial<CSSStyleDeclaration>;
 
-  // Allow any attribute (incl. any "on*" handler) for broad compatibility
+  // Allow any attribute (incl. custom "on*" handlers)
   [key: string]: any;
 
-  // Commonly used event handlers with better typing
+  // Common event handlers with better typing
   onClick?: EventHandler<MouseEvent>;
   onDblClick?: EventHandler<MouseEvent>;
   onMouseDown?: EventHandler<MouseEvent>;
@@ -78,19 +77,23 @@ type IntrinsicElementProps<TagName extends keyof HTMLElementTagNameMap> =
 // ---------- Global JSX namespace ----------
 declare global {
   namespace JSX {
+    // What a JSX expression returns
     type Element = ArfaNode;
 
+    // Props for intrinsic HTML elements
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: IntrinsicElementProps<K>;
     } & {
+      // Fallback for custom elements/tags
       [elemName: string]: DOMAttributes & { children?: ArfaNode };
     };
   }
 
-  // optional runtime globals (set in app bootstrap)
-  // These are typed here so TS won't complain when you write (globalThis as any).h
+  // Optional runtime globals (you set these in your app bootstrap)
+  // Values come from arfa-runtime; types come from here.
   var h: JSXFactory | undefined;
   var Fragment: FragmentComponent | undefined;
 }
 
+// Ensure this file is treated as a module by TS
 export {};
