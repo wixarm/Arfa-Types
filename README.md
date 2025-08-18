@@ -18,7 +18,7 @@ This package provides the type system that powers **JSX**, **components**, and *
 - Router helpers:
   - `PageModule` – describes modules returned by `import.meta.glob`
   - `RouteModules` – record of all page modules
-  - `GuardFn` – function signature for layout guards
+  - `GuardFn` – function signature for layout guards (protected routes)
 - JSX IntrinsicElements typing:
   - Permissive attributes (supports `class`, `className`, `id`, `style`, `on*` events, etc.)
   - Custom element support via string index
