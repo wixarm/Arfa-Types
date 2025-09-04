@@ -5,7 +5,7 @@ export type PrimitiveChild = string | number | boolean | null | undefined;
 export type ArfaNode = PrimitiveChild | VNode | ArfaNode[];
 
 export interface VNode {
-  type: string | Component<any>;
+  type: string | Component<any> | symbol; // Add symbol to support Fragment
   props: Record<string, any> & { children?: ArfaNode };
 }
 
@@ -20,7 +20,7 @@ export type PageComponent<P = {}> = Component<P>;
 
 // ---------- Runtime function types (values live in arfa-runtime) ----------
 export type JSXFactory = (
-  type: string | Component<any>,
+  type: string | Component<any> | symbol, // Add symbol to support Fragment
   props: Record<string, any> | null,
   ...children: any[]
 ) => VNode;
@@ -35,7 +35,7 @@ export type GuardFn = (
 
 export type PageModule = {
   default: PageComponent<any>;
-  // Optional guard metadata supported by your router’s _layout
+  // Optional guard metadata supported by your router's _layout
   protect?: GuardFn;
   protectRedirect?: string;
 } & Record<string, any>;
@@ -81,6 +81,18 @@ declare global {
   namespace JSX {
     type Element = ArfaNode;
 
+    interface ElementAttributesProperty {
+      props: {};
+    }
+
+    interface ElementChildrenAttribute {
+      children: {};
+    }
+
+    interface Fragment {
+      children?: ArfaNode;
+    }
+
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: IntrinsicElementProps<K>;
     } & {
@@ -91,5 +103,7 @@ declare global {
   var h: JSXFactory | undefined;
   var Fragment: FragmentComponent | undefined;
 }
+
+export const Fragment: FragmentComponent;
 
 export {};
