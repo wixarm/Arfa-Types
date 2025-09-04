@@ -81,6 +81,10 @@ declare global {
   namespace JSX {
     type Element = ArfaNode;
 
+    interface ElementClass {
+      // This can be empty, it's just for type checking
+    }
+
     interface ElementAttributesProperty {
       props: {};
     }
@@ -89,8 +93,13 @@ declare global {
       children: {};
     }
 
-    interface Fragment {
-      children?: ArfaNode;
+    // Define Fragment as a function component that returns its children
+    interface Fragment extends FunctionComponent<{}> {
+      // This tells TypeScript that Fragment is a valid JSX element type
+    }
+
+    interface FunctionComponent<P = {}> {
+      (props: PropsWithChildren<P>, context?: any): ArfaNode;
     }
 
     type IntrinsicElements = {
@@ -104,6 +113,15 @@ declare global {
   var Fragment: FragmentComponent | undefined;
 }
 
-export const Fragment: FragmentComponent;
+// Export Fragment for explicit usage
+export declare const Fragment: FragmentComponent;
+
+// Add this to help TypeScript understand JSX Fragment syntax
+declare module JSX {
+  interface IntrinsicElements {
+    // This allows <>...</> syntax
+    fragment: { children?: ArfaNode };
+  }
+}
 
 export {};
