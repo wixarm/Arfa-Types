@@ -5,7 +5,7 @@ export type PrimitiveChild = string | number | boolean | null | undefined;
 export type ArfaNode = PrimitiveChild | VNode | ArfaNode[];
 
 export interface VNode {
-  type: string | Component<any> | symbol; // Add symbol to support Fragment
+  type: string | Component<any>;
   props: Record<string, any> & { children?: ArfaNode };
 }
 
@@ -20,7 +20,7 @@ export type PageComponent<P = {}> = Component<P>;
 
 // ---------- Runtime function types (values live in arfa-runtime) ----------
 export type JSXFactory = (
-  type: string | Component<any> | symbol, // Add symbol to support Fragment
+  type: string | Component<any>,
   props: Record<string, any> | null,
   ...children: any[]
 ) => VNode;
@@ -35,7 +35,7 @@ export type GuardFn = (
 
 export type PageModule = {
   default: PageComponent<any>;
-  // Optional guard metadata supported by your router's _layout
+  // Optional guard metadata supported by your router’s _layout
   protect?: GuardFn;
   protectRedirect?: string;
 } & Record<string, any>;
@@ -81,27 +81,6 @@ declare global {
   namespace JSX {
     type Element = ArfaNode;
 
-    interface ElementClass {
-      // This can be empty, it's just for type checking
-    }
-
-    interface ElementAttributesProperty {
-      props: {};
-    }
-
-    interface ElementChildrenAttribute {
-      children: {};
-    }
-
-    // Define Fragment as a function component that returns its children
-    interface Fragment extends FunctionComponent<{}> {
-      // This tells TypeScript that Fragment is a valid JSX element type
-    }
-
-    interface FunctionComponent<P = {}> {
-      (props: PropsWithChildren<P>, context?: any): ArfaNode;
-    }
-
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: IntrinsicElementProps<K>;
     } & {
@@ -111,17 +90,6 @@ declare global {
 
   var h: JSXFactory | undefined;
   var Fragment: FragmentComponent | undefined;
-}
-
-// Export Fragment for explicit usage
-export declare const Fragment: FragmentComponent;
-
-// Add this to help TypeScript understand JSX Fragment syntax
-declare module JSX {
-  interface IntrinsicElements {
-    // This allows <>...</> syntax
-    fragment: { children?: ArfaNode };
-  }
 }
 
 export {};
