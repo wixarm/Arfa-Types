@@ -1,6 +1,6 @@
 {
   "name": "arfa-types",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Type definitions for the Arfa runtime & JSX",
   "license": "MIT",
   "sideEffects": false,
