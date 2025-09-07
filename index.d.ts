@@ -25,7 +25,7 @@ export type JSXFactory = (
   ...children: any[]
 ) => VNode;
 
-export type FragmentComponent = (props: PropsWithChildren) => ArfaNode;
+export type FragmentComponent = (props: any) => ArfaNode;
 
 // ---------- Router helpers ----------
 export type GuardFn = (
@@ -35,7 +35,7 @@ export type GuardFn = (
 
 export type PageModule = {
   default: PageComponent<any>;
-  // Optional guard metadata supported by your router’s _layout
+  // Optional guard metadata supported by your router's _layout
   protect?: GuardFn;
   protectRedirect?: string;
 } & Record<string, any>;
@@ -81,6 +81,15 @@ declare global {
   namespace JSX {
     type Element = ArfaNode;
 
+    // These are required for JSX to work properly
+    type ElementClass = any;
+    interface ElementAttributesProperty {
+      props: any;
+    }
+    interface ElementChildrenAttribute {
+      children: any;
+    }
+
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: IntrinsicElementProps<K>;
     } & {
@@ -88,8 +97,15 @@ declare global {
     };
   }
 
-  var h: JSXFactory | undefined;
-  var Fragment: FragmentComponent | undefined;
+  // Use either function declarations OR var declarations, not both
+  // Remove the var declarations and keep only the function declarations:
+  function h(
+    type: string | Component<any>,
+    props: Record<string, any> | null,
+    ...children: any[]
+  ): VNode;
+
+  function Fragment(props: { children?: any }): any;
 }
 
 export {};
